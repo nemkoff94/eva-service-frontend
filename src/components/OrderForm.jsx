@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
-
 
 const OrderForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -13,12 +12,17 @@ const OrderForm = ({ onSubmit }) => {
 
   // Инициализация карты
   useEffect(() => {
-    if (!window.ymaps) return;
+    const interval = setInterval(() => {
+      if (window.ymaps) {
+        clearInterval(interval);
+        window.ymaps.ready(initMap);
+      }
+    }, 100);
 
-    window.ymaps.ready(() => {
+    function initMap() {
       const map = new window.ymaps.Map(mapRef.current, {
-        center: [55.0963, 36.6136] , // Обнинск как дефолт
-        zoom: 10,
+        center: [55.0963, 36.6136], // Обнинск
+        zoom: 12,
         controls: ['zoomControl', 'fullscreenControl']
       });
 
@@ -27,26 +31,29 @@ const OrderForm = ({ onSubmit }) => {
         {},
         { draggable: true }
       );
+
       map.geoObjects.add(placemark);
       placemarkRef.current = placemark;
 
-      // Событие перемещения пина
+      // При перемещении пина обновляем carLocation
       placemark.events.add('dragend', async () => {
         const coords = placemark.geometry.getCoordinates();
         const location = await geocode(coords);
         setFormData(prev => ({ ...prev, carLocation: location }));
       });
-    });
+    }
+
+    return () => clearInterval(interval);
   }, []);
 
-  // Функция обратного геокодирования
+  // Обратное геокодирование координат
   const geocode = async (coords) => {
     try {
       const response = await fetch(
-        `https://geocode-maps.yandex.ru/1.x/?apikey=463159bd-17b4-4bfe-a668-084bb1c51604&format=json&geocode=${coords[1]},${coords[0]}`
+        `https://geocode-maps.yandex.ru/1.x/?apikey=ВАШ_API_KEY&format=json&geocode=${coords[1]},${coords[0]}`
       );
       const data = await response.json();
-      const address = data.response.GeoObjectCollection.featureMember[0]?.GeoObject.metaDataProperty?.GeocoderMetaData?.text;
+      const address = data.response.GeoObjectCollection.featureMember[0]?.GeoObject?.metaDataProperty?.GeocoderMetaData?.text;
       return address || '';
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -54,7 +61,7 @@ const OrderForm = ({ onSubmit }) => {
     }
   };
 
-  // Автоподстановка по геолокации
+  // Автоподстановка местоположения пользователя
   const handleDetectLocation = () => {
     if (!navigator.geolocation || !placemarkRef.current) return;
     setLoadingLocation(true);
@@ -65,7 +72,7 @@ const OrderForm = ({ onSubmit }) => {
         const location = await geocode([coords[1], coords[0]]);
         setFormData(prev => ({ ...prev, carLocation: location }));
 
-        // Перемещаем пин
+        // Перемещаем пин и центр карты
         placemarkRef.current.geometry.setCoordinates(coords);
         placemarkRef.current.getMap().setCenter(coords, 14, { duration: 300 });
         setLoadingLocation(false);
