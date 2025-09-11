@@ -80,15 +80,17 @@ const HomePage = () => {
 
           {/* Яндекс бейдж */}
           <div className="flex justify-center mb-8">
-            <iframe 
-              src="https://yandex.ru/sprav/widget/rating-badge/86375406367?type=award" 
-              width="150" 
-              height="50" 
-              frameBorder="0"
-              title="Рейтинг Яндекс"
-              className="border-0"
-            />
-          </div>
+            <div className="scale-125 sm:scale-150 origin-top">
+              <iframe 
+                src="https://yandex.ru/sprav/widget/rating-badge/86375406367?type=award" 
+                width="150" 
+                height="50" 
+                frameBorder="0"
+                title="Рейтинг Яндекс"
+                className="border-0"
+              />
+            </div>
+</div>
         </section>
 
         {/* Форма заказа */}
