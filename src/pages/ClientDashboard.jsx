@@ -198,7 +198,9 @@ const ClientDashboard = () => {
                 <h3 className="font-semibold text-gray-900">Заказ #{order.id}</h3>
                 <span className={`px-2 py-1 rounded-full text-sm ${
                   order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                  order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                  order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                  order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-blue-100 text-blue-800'
                 }`}>
                   {order.status === 'COMPLETED' && 'Завершен'}
                   {order.status === 'CANCELLED' && 'Отменен'}
@@ -206,16 +208,36 @@ const ClientDashboard = () => {
                   {order.status === 'PROCESSING' && 'В работе'}
                 </span>
               </div>
-              <div className="text-gray-600 text-sm">
+              <div className="text-gray-600 text-sm mb-2">
                 <div>Местоположение: {order.carLocation}</div>
                 {order.destination && <div>→ {order.destination}</div>}
                 {order.wheelsLocked && <div>• Колеса заблокированы</div>}
                 <div>Создан: {new Date(order.createdAt).toLocaleString('ru-RU')}</div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+
+        {/* Кнопки управления для активного заказа */}
+        {order.status === 'PENDING' && (
+          <div className="flex space-x-3 mt-2">
+            <button
+              onClick={() => setEditingOrder(order)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
+            >
+              <Edit size={16} className="mr-2" />
+              Дополнить данные
+            </button>
+            <button
+              onClick={() => handleCancelOrder(order.id)}
+              className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-50 flex items-center"
+            >
+              <Trash2 size={16} className="mr-2" />
+              Отменить заказ
+            </button>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+)}
 
       {/* Контакты поддержки */}
       <div className="bg-gray-50 rounded-lg p-6 mt-8">
