@@ -50,7 +50,7 @@ const OrderForm = ({ onSubmit }) => {
   const geocode = async (coords) => {
     try {
       const response = await fetch(
-        `https://geocode-maps.yandex.ru/1.x/?apikey=463159bd-17b4-4bfe-a668-084bb1c51604&format=json&geocode=${coords[1]},${coords[0]}`
+        `https://geocode-maps.yandex.ru/1.x/?apikey=463159bd-17b4-4bfe-a668-084bb1c51604&format=json&geocode=${lon},${lat}`
       );
       const data = await response.json();
       const address = data.response.GeoObjectCollection.featureMember[0]?.GeoObject?.metaDataProperty?.GeocoderMetaData?.text;
@@ -68,7 +68,7 @@ const OrderForm = ({ onSubmit }) => {
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const coords = [position.coords.latitude, position.coords.longitude];
+        const coords = placemark.geometry.getCoordinates();
         const location = await geocode([coords[1], coords[0]]);
         setFormData(prev => ({ ...prev, carLocation: location }));
 
