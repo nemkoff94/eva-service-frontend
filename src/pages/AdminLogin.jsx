@@ -1,7 +1,7 @@
 // ~/eva-service-frontend/src/pages/AdminLogin.jsx
 import React, { useState } from 'react';
 import { Phone, Lock, LogIn } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Правильный путь
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
