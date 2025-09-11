@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'; // Используем useAut
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ServiceAreaMap from '../components/ServiceAreaMap';
+import { Head } from 'react-head';
 
 const HomePage = () => {
   const [showOrderForm, setShowOrderForm] = useState(false);
@@ -39,6 +40,23 @@ const HomePage = () => {
 
   return (
     <>
+      {/* SEO для страницы через react-head */}
+      <Head>
+        <title>Эвакуатор в Обнинске — Eva Service 24/7</title>
+        <meta
+          name="description"
+          content="Круглосуточный эвакуатор в Обнинске, Балабаново и Малоярославце. Быстрая подача от 9 минут, современные эвакуаторы и круглосуточная поддержка."
+        />
+        <meta
+          name="keywords"
+          content="эвакуатор Обнинск, вызвать эвакуатор, эвакуатор Балабаново, эвакуатор Малоярославец, эвакуатор круглосуточно"
+        />
+        <meta property="og:title" content="Эвакуатор в Обнинске — Eva Service 24/7" />
+        <meta property="og:description" content="Быстрая подача эвакуатора от 9 минут. Работаем круглосуточно." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://evakuators24-7.ru" />
+      </Head>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero блок */}
         <section className="text-center mb-16">
