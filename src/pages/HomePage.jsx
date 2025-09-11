@@ -15,6 +15,15 @@ const HomePage = () => {
   const { loginClient } = useAuth(); // Используем loginClient из контекста
   const navigate = useNavigate();
 
+  // Для плавной прокрутки к форме
+  const orderFormRef = useRef(null);
+  const handleShowOrderForm = () => {
+    setShowOrderForm(true);
+    setTimeout(() => {
+      orderFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
   const handleOrderSubmit = async (formData) => {
     try {
       // Используем loginClient из AuthContext
@@ -63,7 +72,7 @@ const HomePage = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <button 
-              onClick={() => setShowOrderForm(true)}
+              onClick={handleShowOrderForm}
               className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg"
             >
               Вызвать эвакуатор
@@ -106,7 +115,7 @@ const HomePage = () => {
 
         {/* Форма заказа */}
         {showOrderForm && (
-          <section className="mb-16">
+          <section ref={orderFormRef} className="mb-16">
             <OrderForm onSubmit={handleOrderSubmit} />
           </section>
         )}

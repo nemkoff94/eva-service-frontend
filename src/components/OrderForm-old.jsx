@@ -1,82 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+// ~/eva-service-frontend/src/components/OrderForm.jsx
+import React, { useState } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
-import InputMask from 'react-input-mask';
 
 const OrderForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
     carLocation: '',
     phone: ''
   });
-  const [loadingLocation, setLoadingLocation] = useState(false);
-  const mapRef = useRef(null);
-  const placemarkRef = useRef(null);
-
-  // Инициализация карты
-  useEffect(() => {
-    if (!window.ymaps) return;
-
-    window.ymaps.ready(() => {
-      const map = new window.ymaps.Map(mapRef.current, {
-        center: [55.753215, 37.622504], // Москва как дефолт
-        zoom: 10,
-        controls: ['zoomControl', 'fullscreenControl']
-      });
-
-      const placemark = new window.ymaps.Placemark(
-        map.getCenter(),
-        {},
-        { draggable: true }
-      );
-      map.geoObjects.add(placemark);
-      placemarkRef.current = placemark;
-
-      // Событие перемещения пина
-      placemark.events.add('dragend', async () => {
-        const coords = placemark.geometry.getCoordinates();
-        const location = await geocode(coords);
-        setFormData(prev => ({ ...prev, carLocation: location }));
-      });
-    });
-  }, []);
-
-  // Функция обратного геокодирования
-  const geocode = async (coords) => {
-    try {
-      const response = await fetch(
-        `https://geocode-maps.yandex.ru/1.x/?apikey=ВАШ_API_KEY&format=json&geocode=${coords[1]},${coords[0]}`
-      );
-      const data = await response.json();
-      const address = data.response.GeoObjectCollection.featureMember[0]?.GeoObject.metaDataProperty?.GeocoderMetaData?.text;
-      return address || '';
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      return '';
-    }
-  };
-
-  // Автоподстановка по геолокации
-  const handleDetectLocation = () => {
-    if (!navigator.geolocation || !placemarkRef.current) return;
-    setLoadingLocation(true);
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const coords = [position.coords.latitude, position.coords.longitude];
-        const location = await geocode([coords[1], coords[0]]);
-        setFormData(prev => ({ ...prev, carLocation: location }));
-
-        // Перемещаем пин
-        placemarkRef.current.geometry.setCoordinates(coords);
-        placemarkRef.current.getMap().setCenter(coords, 14, { duration: 300 });
-        setLoadingLocation(false);
-      },
-      (err) => {
-        console.error(err);
-        setLoadingLocation(false);
-        alert('Не удалось определить местоположение');
-      }
-    );
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -113,23 +43,19 @@ const OrderForm = ({ onSubmit }) => {
           <button
             type="button"
             className="mt-2 text-sm text-blue-600 hover:text-blue-700 flex items-center"
-            onClick={handleDetectLocation}
           >
             <Navigation className="w-4 h-4 mr-1" />
-            {loadingLocation ? 'Определяем...' : 'Определить местоположение'}
+            Определить местоположение
           </button>
         </div>
-
-        {/* Карта */}
-        <div ref={mapRef} className="w-full h-64 rounded-lg mt-4 border border-gray-300" />
 
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
             <Phone className="w-4 h-4 inline mr-1" />
             Номер телефона
           </label>
-          <InputMask
-            mask="+7 (999) 999-99-99"
+          <input
+            type="tel"
             id="phone"
             name="phone"
             placeholder="+7 (900) 123-45-67"
