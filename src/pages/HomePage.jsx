@@ -234,9 +234,6 @@ const HomePage = () => {
           </div>
         </section>
       </div>
-
-      {/* Футер */}
-      <Footer />
     </>
   );
 };
