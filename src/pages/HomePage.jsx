@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { Phone, MessageCircle, Clock, MapPin, Headphones, Star, Users } from 'lucide-react';
 import OrderForm from '../components/OrderForm';
 import PhotoCarousel from '../components/PhotoCarousel';
-import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext'; // Используем useAuth
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ServiceAreaMap from '../components/ServiceAreaMap';
 
 const HomePage = () => {
   const [showOrderForm, setShowOrderForm] = useState(false);
@@ -181,6 +181,9 @@ const HomePage = () => {
           <PhotoCarousel />
         </section>
 
+        {/* Зона обслуживания */}
+        <ServiceAreaMap />
+
         {/* Отзывы с Яндекс Карт */}
         <section className="mb-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Отзывы клиентов</h2>
@@ -236,8 +239,6 @@ const HomePage = () => {
           </div>
         </section>
       </div>
-      
-      <Footer />
     </>
   );
 };
