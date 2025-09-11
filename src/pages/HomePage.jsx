@@ -1,5 +1,5 @@
 // ~/eva-service-frontend/src/pages/HomePage.jsx
-import React, { useState } from 'react';
+import React, { useState , useRef } from 'react';
 import { Phone, MessageCircle, Clock, MapPin, Headphones, Star, Users } from 'lucide-react';
 import OrderForm from '../components/OrderForm';
 import PhotoCarousel from '../components/PhotoCarousel';
