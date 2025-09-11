@@ -19,17 +19,21 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   if (!user) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
+  // Если указана requiredRole, проверяем соответствие
   if (requiredRole && user.role !== requiredRole) {
-    // Редирект в зависимости от роли
-    if (user.role === 'ADMIN') {
-      return <Navigate to="/admin" replace />;
-    } else if (user.role === 'DRIVER') {
-      return <Navigate to="/driver" replace />;
-    } else {
-      return <Navigate to="/client" replace />;
+    // Редиректим на соответствующую панель в зависимости от роли
+    switch (user.role) {
+      case 'ADMIN':
+        return <Navigate to="/admin" replace />;
+      case 'DRIVER':
+        return <Navigate to="/driver" replace />;
+      case 'CLIENT':
+        return <Navigate to="/client" replace />;
+      default:
+        return <Navigate to="/" replace />;
     }
   }
 

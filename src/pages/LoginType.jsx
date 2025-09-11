@@ -25,7 +25,7 @@ const LoginType = () => {
           <div className="grid grid-cols-1 gap-4">
             {/* Клиент */}
             <Link
-              to="/login"
+              to="/login-client" // Исправляем ссылку
               className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
               <Smartphone className="w-8 h-8 text-blue-600 mr-4" />

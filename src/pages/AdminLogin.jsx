@@ -1,7 +1,7 @@
 // ~/eva-service-frontend/src/pages/AdminLogin.jsx
 import React, { useState } from 'react';
 import { Phone, Lock, LogIn } from 'lucide-react';
-import { useAuth } from '../context/AuthContext'; // Используем useAuth
+import { useAuth } from '../context/AuthContext';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +10,7 @@ const AdminLogin = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { loginWithPassword } = useAuth(); // Используем loginWithPassword из контекста
+  const { loginWithPassword } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
