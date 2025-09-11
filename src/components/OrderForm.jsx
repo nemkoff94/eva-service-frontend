@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
-import InputMask from 'react-input-mask';
 
 
 const OrderForm = ({ onSubmit }) => {
@@ -129,8 +128,8 @@ const OrderForm = ({ onSubmit }) => {
             <Phone className="w-4 h-4 inline mr-1" />
             Номер телефона
           </label>
-          <InputMask
-            mask="+7 (999) 999-99-99"
+          <input
+            type="tel"
             id="phone"
             name="phone"
             placeholder="+7 (900) 123-45-67"
