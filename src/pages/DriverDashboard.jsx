@@ -175,3 +175,62 @@ const DriverDashboard = () => {
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                     ) : (
                       <CheckCircle className="w-4 h-4 mr-2" />
+                    )}
+                    Выехал к клиенту
+                  </button>
+                )}
+                
+                {order.status === 'DRIVER_ON_THE_WAY' && order.eta && (
+                  <button
+                    onClick={() => addTimeToETA(order.id, 10)}
+                    disabled={updating === order.id}
+                    className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-700 flex items-center disabled:opacity-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    +10 мин к времени
+                  </button>
+                )}
+                
+                <button
+                  onClick={() => window.open(`tel:${order.client.phone}`)}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 flex items-center"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Позвонить
+                </button>
+              </div>
+
+              {/* Предупреждение о заблокированных колесах */}
+              {order.wheelsLocked && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center">
+                    <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+                    <span className="text-red-800 font-medium">Колеса заблокированы!</span>
+                  </div>
+                  <p className="text-red-600 text-sm mt-1">
+                    Требуется специальное оборудование для эвакуации
+                  </p>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Инструкция */}
+      {orders.length > 0 && (
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h3 className="font-semibold text-blue-900 mb-2">Инструкция:</h3>
+          <ul className="text-blue-800 text-sm space-y-1">
+            <li>• Нажмите "Проложить маршрут" для навигации в Яндекс Картах</li>
+            <li>• "Выехал к клиенту" - меняет статус заказа</li>
+            <li>• "+10 мин" - добавляет время к ETA при задержке</li>
+            <li>• "Позвонить" - прямой звонок клиенту</li>
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DriverDashboard;

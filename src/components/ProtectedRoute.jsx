@@ -1,9 +1,11 @@
+// ~/eva-service-frontend/src/components/ProtectedRoute.jsx
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -16,7 +18,22 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return user ? children : <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  if (requiredRole && user.role !== requiredRole) {
+    // Редирект в зависимости от роли
+    if (user.role === 'ADMIN') {
+      return <Navigate to="/admin" replace />;
+    } else if (user.role === 'DRIVER') {
+      return <Navigate to="/driver" replace />;
+    } else {
+      return <Navigate to="/client" replace />;
+    }
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;

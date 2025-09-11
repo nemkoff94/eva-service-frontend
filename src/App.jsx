@@ -22,33 +22,30 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/admin/login" element={<AdminLogin />} />
-              
-              <Route 
-                path="/client" 
-                element={
-                  <ProtectedRoute>
-                    <ClientDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin" 
-                element={
-                  <ProtectedRoute>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              <Route 
-                path="/driver" 
-                element={
-                  <ProtectedRoute>
-                    <DriverDashboard />
-                  </ProtectedRoute>
-                } 
-              />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requiredRole="ADMIN">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/driver" 
+              element={
+                <ProtectedRoute requiredRole="DRIVER">
+                  <DriverDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/client" 
+              element={
+                <ProtectedRoute requiredRole="CLIENT">
+                  <ClientDashboard />
+                </ProtectedRoute>
+              } 
+            />
               
               {/* Fallback route */}
               <Route path="*" element={<HomePage />} />
