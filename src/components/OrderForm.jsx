@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
 import InputMask from 'react-input-mask';
 
+
 const OrderForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
     carLocation: '',
@@ -17,7 +18,7 @@ const OrderForm = ({ onSubmit }) => {
 
     window.ymaps.ready(() => {
       const map = new window.ymaps.Map(mapRef.current, {
-        center: [55.753215, 37.622504], // Москва как дефолт
+        center: [55.0963, 36.6136] , // Обнинск как дефолт
         zoom: 10,
         controls: ['zoomControl', 'fullscreenControl']
       });
@@ -43,7 +44,7 @@ const OrderForm = ({ onSubmit }) => {
   const geocode = async (coords) => {
     try {
       const response = await fetch(
-        `https://geocode-maps.yandex.ru/1.x/?apikey=ВАШ_API_KEY&format=json&geocode=${coords[1]},${coords[0]}`
+        `https://geocode-maps.yandex.ru/1.x/?apikey=463159bd-17b4-4bfe-a668-084bb1c51604&format=json&geocode=${coords[1]},${coords[0]}`
       );
       const data = await response.json();
       const address = data.response.GeoObjectCollection.featureMember[0]?.GeoObject.metaDataProperty?.GeocoderMetaData?.text;
