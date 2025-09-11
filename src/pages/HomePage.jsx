@@ -4,38 +4,38 @@ import { Phone, MessageCircle, Clock, MapPin, Headphones, Star, Users } from 'lu
 import OrderForm from '../components/OrderForm';
 import PhotoCarousel from '../components/PhotoCarousel';
 import Footer from '../components/Footer';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Используем useAuth
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const HomePage = () => {
   const [showOrderForm, setShowOrderForm] = useState(false);
-  const { login } = useAuth();
+  const { loginClient } = useAuth(); // Используем loginClient из контекста
   const navigate = useNavigate();
 
   const handleOrderSubmit = async (formData) => {
-  try {
-    // Используем новый маршрут для клиентов
-    const loginResult = await axios.post('/api/auth/login-client', {
-      phone: formData.phone
-    });
-    
-    if (loginResult.data) {
-      // Создаем заказ
-      const orderResult = await axios.post('/api/orders', {
-        carLocation: formData.carLocation,
-        phone: formData.phone
-      });
+    try {
+      // Используем loginClient из AuthContext
+      const loginResult = await loginClient(formData.phone);
       
-      if (orderResult.data) {
-        navigate('/client');
+      if (loginResult.success) {
+        // Создаем заказ
+        const orderResult = await axios.post('/api/orders', {
+          carLocation: formData.carLocation,
+          phone: formData.phone
+        });
+        
+        if (orderResult.data) {
+          navigate('/client');
+        }
+      } else {
+        alert('Ошибка входа: ' + loginResult.error);
       }
+    } catch (error) {
+      console.error('Order submission error:', error);
+      alert(error.response?.data?.message || 'Произошла ошибка при создании заказа');
     }
-  } catch (error) {
-    console.error('Order submission error:', error);
-    alert(error.response?.data?.message || 'Произошла ошибка при создании заказа');
-  }
-};
+  };
 
   return (
     <>
@@ -236,6 +236,8 @@ const HomePage = () => {
           </div>
         </section>
       </div>
+      
+      <Footer />
     </>
   );
 };

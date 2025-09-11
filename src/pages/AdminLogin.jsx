@@ -1,9 +1,7 @@
 // ~/eva-service-frontend/src/pages/AdminLogin.jsx
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { Phone, Lock, LogIn } from 'lucide-react';
-import axios from 'axios'; 
+import { useAuth } from '../context/AuthContext'; // Используем useAuth
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -12,38 +10,34 @@ const AdminLogin = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { loginWithPassword } = useAuth(); // Используем loginWithPassword из контекста
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  try {
-    const response = await axios.post('/api/auth/login-password', {
-      phone: formData.phone,
-      password: formData.password
-    });
-
-    if (response.data) {
-      localStorage.setItem('token', response.data.token);
+    try {
+      const result = await loginWithPassword(formData.phone, formData.password);
       
-      // Редирект в зависимости от роли
-      if (response.data.user.role === 'ADMIN') {
-        window.location.href = '/admin';
-      } else if (response.data.user.role === 'DRIVER') {
-        window.location.href = '/driver';
+      if (result.success) {
+        // Редирект в зависимости от роли
+        if (result.data.user.role === 'ADMIN') {
+          window.location.href = '/admin';
+        } else if (result.data.user.role === 'DRIVER') {
+          window.location.href = '/driver';
+        } else {
+          window.location.href = '/client';
+        }
       } else {
-        window.location.href = '/client';
+        setError(result.error);
       }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Ошибка входа');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setError(error.response?.data?.message || 'Ошибка входа');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleChange = (e) => {
     setFormData(prev => ({

@@ -44,8 +44,56 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post('/api/auth/login', { phone });
       
       const { token, user: userData } = response.data;
+      
+      // Сохраняем токен и настраиваем axios
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      setUser(userData);
+      
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Ошибка входа' 
+      };
+    }
+  };
+
+  const loginWithPassword = async (phone, password) => {
+    try {
+      const response = await axios.post('/api/auth/login-password', {
+        phone,
+        password
+      });
+      
+      const { token, user: userData } = response.data;
+      
+      // Сохраняем токен и настраиваем axios
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      setUser(userData);
+      
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Ошибка входа' 
+      };
+    }
+  };
+
+  const loginClient = async (phone) => {
+    try {
+      const response = await axios.post('/api/auth/login-client', { phone });
+      
+      const { token, user: userData } = response.data;
+      
+      // Сохраняем токен и настраиваем axios
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
       setUser(userData);
       
       return { success: true, data: response.data };
@@ -66,6 +114,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    loginWithPassword,
+    loginClient,
     logout,
     loading
   };
