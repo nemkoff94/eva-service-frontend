@@ -33,7 +33,7 @@ const ClientDashboard = () => {
       navigate('/');
       return;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // прокрутка вверх
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     fetchOrders();
   }, [user, navigate]);
 
@@ -49,9 +49,7 @@ const ClientDashboard = () => {
   };
 
   const handleUpdateOrder = (updatedOrder) => {
-    setOrders(prev => prev.map(order => 
-      order.id === updatedOrder.id ? updatedOrder : order
-    ));
+    setOrders(prev => prev.map(order => order.id === updatedOrder.id ? updatedOrder : order));
   };
 
   const handleCancelOrder = async (orderId) => {
@@ -77,11 +75,12 @@ const ClientDashboard = () => {
   }
 
   const activeOrders = orders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING');
-  const lastActiveOrder = activeOrders[activeOrders.length - 1]; // последний активный
+  const lastActiveOrder = activeOrders[activeOrders.length - 1];
   const historyOrders = orders.filter(o => o.id !== lastActiveOrder?.id);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
       {/* Уведомление о принятой заявке */}
       {showNotification && lastActiveOrder && (
         <div className="relative bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg">
@@ -156,23 +155,21 @@ const ClientDashboard = () => {
             </div>
           </div>
           {lastActiveOrder.status === 'PENDING' && (
-            <div className="pt-4 border-t border-gray-200">
-              <div className="flex space-x-3">
-                <button 
-                  onClick={() => setEditingOrder(lastActiveOrder)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
-                >
-                  <Edit size={16} className="mr-2" />
-                  Дополнить данные
-                </button>
-                <button 
-                  onClick={() => handleCancelOrder(lastActiveOrder.id)}
-                  className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-50 flex items-center"
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Отменить заказ
-                </button>
-              </div>
+            <div className="pt-4 border-t border-gray-200 flex space-x-3">
+              <button 
+                onClick={() => setEditingOrder(lastActiveOrder)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
+              >
+                <Edit size={16} className="mr-2" />
+                Дополнить данные
+              </button>
+              <button 
+                onClick={() => handleCancelOrder(lastActiveOrder.id)}
+                className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-50 flex items-center"
+              >
+                <Trash2 size={16} className="mr-2" />
+                Отменить заказ
+              </button>
             </div>
           )}
         </div>
@@ -215,29 +212,29 @@ const ClientDashboard = () => {
                 <div>Создан: {new Date(order.createdAt).toLocaleString('ru-RU')}</div>
               </div>
 
-        {/* Кнопки управления для активного заказа */}
-        {order.status === 'PENDING' && (
-          <div className="flex space-x-3 mt-2">
-            <button
-              onClick={() => setEditingOrder(order)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
-            >
-              <Edit size={16} className="mr-2" />
-              Дополнить данные
-            </button>
-            <button
-              onClick={() => handleCancelOrder(order.id)}
-              className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-50 flex items-center"
-            >
-              <Trash2 size={16} className="mr-2" />
-              Отменить заказ
-            </button>
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-)}
+              {/* Кнопки управления для активного заказа */}
+              {order.status === 'PENDING' && (
+                <div className="flex space-x-3 mt-2">
+                  <button
+                    onClick={() => setEditingOrder(order)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
+                  >
+                    <Edit size={16} className="mr-2" />
+                    Дополнить данные
+                  </button>
+                  <button
+                    onClick={() => handleCancelOrder(order.id)}
+                    className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-50 flex items-center"
+                  >
+                    <Trash2 size={16} className="mr-2" />
+                    Отменить заказ
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Контакты поддержки */}
       <div className="bg-gray-50 rounded-lg p-6 mt-8">
