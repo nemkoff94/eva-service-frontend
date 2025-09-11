@@ -38,7 +38,7 @@ const OrderForm = ({ onSubmit }) => {
       // При перемещении пина обновляем carLocation
       placemark.events.add('dragend', async () => {
         const coords = placemark.geometry.getCoordinates();
-        const location = await geocode(coords);
+        const location = await geocode([coords[1], coords[0]]); // [lon, lat]
         setFormData(prev => ({ ...prev, carLocation: location }));
       });
     }
@@ -47,13 +47,14 @@ const OrderForm = ({ onSubmit }) => {
   }, []);
 
   // Обратное геокодирование координат
-  const geocode = async (coords) => {
+  const geocode = async ([lon, lat]) => {
     try {
       const response = await fetch(
-        `https://geocode-maps.yandex.ru/1.x/?apikey=463159bd-17b4-4bfe-a668-084bb1c51604&format=json&geocode=${lon},${lat}`
+        `https://geocode-maps.yandex.ru/1.x/?apikey=ВАШ_API_KEY&format=json&geocode=${lon},${lat}`
       );
       const data = await response.json();
-      const address = data.response.GeoObjectCollection.featureMember[0]?.GeoObject?.metaDataProperty?.GeocoderMetaData?.text;
+      const address =
+        data.response.GeoObjectCollection.featureMember[0]?.GeoObject?.metaDataProperty?.GeocoderMetaData?.text;
       return address || '';
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -68,7 +69,7 @@ const OrderForm = ({ onSubmit }) => {
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const coords = placemark.geometry.getCoordinates();
+        const coords = [position.coords.latitude, position.coords.longitude];
         const location = await geocode([coords[1], coords[0]]);
         setFormData(prev => ({ ...prev, carLocation: location }));
 
