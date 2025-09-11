@@ -11,6 +11,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import DriverDashboard from './pages/DriverDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
+import ClientLogin from './pages/ClientLogin';
+import LoginType from './pages/LoginType';
+
 
 function App() {
   return (
@@ -21,8 +24,11 @@ function App() {
           <main>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
+              <Route path="/login" element={<LoginType />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/login-client" element={<ClientLogin />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/login-type" element={<LoginType />} />
             <Route 
               path="/admin" 
               element={

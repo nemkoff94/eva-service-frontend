@@ -1,54 +1,34 @@
-// ~/eva-service-frontend/src/pages/AdminLogin.jsx
+// ~/eva-service-frontend/src/pages/ClientLogin.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Phone, Lock, LogIn } from 'lucide-react';
+import { Phone, LogIn, UserPlus } from 'lucide-react';
+import axios from 'axios';
 
-const AdminLogin = () => {
-  const [formData, setFormData] = useState({
-    phone: '',
-    password: ''
-  });
+const ClientLogin = () => {
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  try {
-    const response = await axios.post('/api/auth/login-password', {
-      phone: formData.phone,
-      password: formData.password
-    });
-
-    if (response.data) {
-      localStorage.setItem('token', response.data.token);
+    try {
+      const response = await axios.post('/api/auth/login-client', { phone });
       
-      // Редирект в зависимости от роли
-      if (response.data.user.role === 'ADMIN') {
-        window.location.href = '/admin';
-      } else if (response.data.user.role === 'DRIVER') {
-        window.location.href = '/driver';
-      } else {
+      if (response.data) {
+        localStorage.setItem('token', response.data.token);
         window.location.href = '/client';
       }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Ошибка входа');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setError(error.response?.data?.message || 'Ошибка входа');
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
   };
 
   return (
@@ -56,14 +36,14 @@ const AdminLogin = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="bg-blue-600 p-3 rounded-full">
-            <Lock className="w-8 h-8 text-white" />
+            <Phone className="w-8 h-8 text-white" />
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Вход для персонала
+          Вход для клиентов
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Введите номер телефона и пароль
+          Введите ваш номер телефона
         </p>
       </div>
 
@@ -72,7 +52,6 @@ const AdminLogin = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                <Phone className="w-4 h-4 inline mr-1" />
                 Номер телефона
               </label>
               <div className="mt-1">
@@ -82,26 +61,8 @@ const AdminLogin = () => {
                   type="tel"
                   placeholder="+7 (900) 123-45-67"
                   required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Пароль
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Введите пароль"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -133,7 +94,7 @@ const AdminLogin = () => {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Пароль по умолчанию для водителей: 0000
+              Нет аккаунта? Он создастся автоматически при первом входе
             </p>
           </div>
         </div>
@@ -142,4 +103,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default ClientLogin;

@@ -14,26 +14,28 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const handleOrderSubmit = async (formData) => {
-    try {
-      const loginResult = await login(formData.phone);
+  try {
+    // Используем новый маршрут для клиентов
+    const loginResult = await axios.post('/api/auth/login-client', {
+      phone: formData.phone
+    });
+    
+    if (loginResult.data) {
+      // Создаем заказ
+      const orderResult = await axios.post('/api/orders', {
+        carLocation: formData.carLocation,
+        phone: formData.phone
+      });
       
-      if (loginResult.success) {
-        const orderResult = await axios.post('/api/orders', {
-          carLocation: formData.carLocation,
-          phone: formData.phone
-        });
-        
-        if (orderResult.data) {
-          navigate('/client');
-        }
-      } else {
-        alert('Ошибка входа: ' + loginResult.error);
+      if (orderResult.data) {
+        navigate('/client');
       }
-    } catch (error) {
-      console.error('Order submission error:', error);
-      alert('Произошла ошибка при создании заказа. Попробуйте еще раз.');
     }
-  };
+  } catch (error) {
+    console.error('Order submission error:', error);
+    alert(error.response?.data?.message || 'Произошла ошибка при создании заказа');
+  }
+};
 
   return (
     <>
