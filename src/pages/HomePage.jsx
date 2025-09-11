@@ -91,7 +91,7 @@ const HomePage = () => {
 
           {/* Яндекс бейдж */}
           <div className="flex justify-center mb-8">
-            <div className="scale-125 sm:scale-150 origin-top">
+            <div className="scale-150 sm:scale-150 origin-top">
               <iframe 
                 src="https://yandex.ru/sprav/widget/rating-badge/86375406367?type=award" 
                 width="150" 
