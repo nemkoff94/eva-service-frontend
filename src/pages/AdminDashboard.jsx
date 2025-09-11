@@ -10,7 +10,11 @@ import {
   Clock, 
   Phone,
   Filter,
-  Search
+  Search,
+  Save,
+  X,
+  Eye,
+  Trash2
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -25,6 +29,11 @@ const AdminDashboard = () => {
     pendingOrders: 0,
     activeDrivers: 0
   });
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
+  const [viewingOrder, setViewingOrder] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchData();
@@ -51,6 +60,7 @@ const AdminDashboard = () => {
 
     } catch (error) {
       console.error('Error fetching data:', error);
+      alert('Ошибка при загрузке данных');
     } finally {
       setLoading(false);
     }
@@ -62,8 +72,74 @@ const AdminDashboard = () => {
       fetchData(); // Обновляем данные
     } catch (error) {
       console.error('Error updating order:', error);
+      alert('Ошибка при обновлении статуса');
     }
   };
+
+  const handleEditOrder = (order) => {
+    setEditingOrder(order);
+    setEditFormData({
+      status: order.status,
+      driverId: order.driverId || '',
+      eta: order.eta ? new Date(order.eta).toISOString().slice(0, 16) : ''
+    });
+  };
+
+  const handleViewOrder = (order) => {
+    setViewingOrder(order);
+  };
+
+  const handleSaveOrder = async () => {
+    try {
+      const response = await axios.patch(`/api/admin/orders/${editingOrder.id}`, editFormData);
+      
+      // Обновляем список заказов
+      setOrders(prev => prev.map(order => 
+        order.id === editingOrder.id ? response.data.order : order
+      ));
+      
+      setEditingOrder(null);
+      setEditFormData({});
+      alert('Заказ успешно обновлен!');
+    } catch (error) {
+      console.error('Error saving order:', error);
+      alert('Ошибка при сохранении заказа');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingOrder(null);
+    setEditFormData({});
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
+
+    try {
+      await axios.delete(`/api/orders/${orderId}`);
+      alert('Заказ успешно удален!');
+      fetchData(); // Обновляем список
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      alert('Ошибка при удалении заказа');
+    }
+  };
+
+  // Фильтрация заказов
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = order.client.phone.includes(searchTerm) || 
+                         order.carLocation.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   if (loading) {
     return (
@@ -168,12 +244,30 @@ const AdminDashboard = () => {
                   <input
                     type="text"
                     placeholder="Поиск заказов..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <button className="px-4 py-2 border border-gray-300 rounded-md flex items-center">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Фильтр
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Все статусы</option>
+                  <option value="PENDING">Ожидание</option>
+                  <option value="PROCESSING">В обработке</option>
+                  <option value="DRIVER_ASSIGNED">Водитель назначен</option>
+                  <option value="DRIVER_ON_THE_WAY">В пути</option>
+                  <option value="COMPLETED">Завершен</option>
+                  <option value="CANCELLED">Отменен</option>
+                </select>
+                <button 
+                  onClick={fetchData}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Обновить
                 </button>
               </div>
             </div>
@@ -203,8 +297,8 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {orders.map((order) => (
-                    <tr key={order.id}>
+                  {filteredOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         #{order.id}
                       </td>
@@ -217,7 +311,7 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4 text-sm text-gray-900">
                         <div className="flex items-center">
                           <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                          {order.carLocation}
+                          <span className="truncate max-w-xs">{order.carLocation}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -237,15 +331,40 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(order.createdAt).toLocaleString('ru-RU')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <button 
+                          onClick={() => handleViewOrder(order)}
+                          className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                          title="Просмотреть детали"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleEditOrder(order)}
+                          className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                          title="Редактировать"
+                        >
                           <Edit className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteOrder(order.id)}
+                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                          title="Удалить"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              
+              {filteredOrders.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Package className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p>Заказы не найдены</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -266,6 +385,11 @@ const AdminDashboard = () => {
                   <div className="text-sm text-gray-600">
                     Зарегистрирован: {new Date(user.createdAt).toLocaleDateString('ru-RU')}
                   </div>
+                  {user.driver && (
+                    <div className="text-sm text-gray-600 mt-1">
+                      Водитель: {user.driver.name}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -288,12 +412,174 @@ const AdminDashboard = () => {
                   <div className="text-sm text-gray-600">
                     ID: {driver.id}
                   </div>
+                  <div className="text-sm text-gray-600">
+                    Создан: {new Date(driver.user.createdAt).toLocaleDateString('ru-RU')}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* Модальное окно редактирования */}
+      {editingOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Редактирование заказа #{editingOrder.id}</h2>
+              <button
+                onClick={handleCancelEdit}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Статус
+                </label>
+                <select
+                  name="status"
+                  value={editFormData.status}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="PENDING">Ожидание</option>
+                  <option value="PROCESSING">В обработке</option>
+                  <option value="DRIVER_ASSIGNED">Водитель назначен</option>
+                  <option value="DRIVER_ON_THE_WAY">В пути к клиенту</option>
+                  <option value="COMPLETED">Завершен</option>
+                  <option value="CANCELLED">Отменен</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Водитель
+                </label>
+                <select
+                  name="driverId"
+                  value={editFormData.driverId}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Не назначен</option>
+                  {drivers.map(driver => (
+                    <option key={driver.id} value={driver.id}>
+                      {driver.name} ({driver.user.phone})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Время прибытия (ETA)
+                </label>
+                <input
+                  type="datetime-local"
+                  name="eta"
+                  value={editFormData.eta}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={handleSaveOrder}
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Сохранить
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md font-medium hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно просмотра */}
+      {viewingOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Заказ #{viewingOrder.id}</h2>
+              <button
+                onClick={() => setViewingOrder(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <Phone className="w-5 h-5 text-gray-400 mr-3" />
+                <span className="text-gray-900">{viewingOrder.client.phone}</span>
+              </div>
+              
+              <div className="flex items-center">
+                <MapPin className="w-5 h-5 text-gray-400 mr-3" />
+                <span className="text-gray-900">{viewingOrder.carLocation}</span>
+              </div>
+              
+              {viewingOrder.destination && (
+                <div className="flex items-center">
+                  <MapPin className="w-5 h-5 text-gray-400 mr-3" />
+                  <span className="text-gray-600">→ {viewingOrder.destination}</span>
+                </div>
+              )}
+              
+              {viewingOrder.driver && (
+                <div className="flex items-center">
+                  <Truck className="w-5 h-5 text-gray-400 mr-3" />
+                  <span className="text-gray-900">
+                    Водитель: {viewingOrder.driver.name} ({viewingOrder.driver.user.phone})
+                  </span>
+                </div>
+              )}
+              
+              <div className="flex items-center">
+                <Clock className="w-5 h-5 text-gray-400 mr-3" />
+                <span className="text-gray-600">
+                  Создан: {new Date(viewingOrder.createdAt).toLocaleString('ru-RU')}
+                </span>
+              </div>
+              
+              {viewingOrder.eta && (
+                <div className="flex items-center">
+                  <Clock className="w-5 h-5 text-gray-400 mr-3" />
+                  <span className="text-gray-600">
+                    ETA: {new Date(viewingOrder.eta).toLocaleString('ru-RU')}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setViewingOrder(null);
+                  handleEditOrder(viewingOrder);
+                }}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700"
+              >
+                Редактировать заказ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
