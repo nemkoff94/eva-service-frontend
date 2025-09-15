@@ -110,7 +110,7 @@ const HomePage = () => {
                 className="border-0"
               />
             </div>
-</div>
+          </div>
         </section>
 
         {/* Форма заказа */}
