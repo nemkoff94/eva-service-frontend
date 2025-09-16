@@ -3,18 +3,38 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import { HeadProvider } from 'react-head';
-import { YMInitializer } from 'react-yandex-metrika';
 
-const COUNTER_ID = 104173658; // Замените на номер вашего счётчика
+const COUNTER_ID = 104173658; // твой ID счётчика
+
+// Функция для инициализации Яндекс.Метрики
+function initYandexMetrika() {
+  if (!window.ym) {
+    // Создаём временную функцию для накопления команд до загрузки скрипта
+    window.ym = function () {
+      (window.ym.a = window.ym.a || []).push(arguments);
+    };
+    window.ym.l = 1 * new Date();
+
+    // Добавляем скрипт tag.js
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://mc.yandex.ru/metrika/tag.js';
+    document.head.appendChild(script);
+
+    // Инициализация счётчика
+    window.ym(COUNTER_ID, 'init', {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: false, // пока отключаем для теста
+    });
+  }
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HeadProvider>
-      {/* Инициализация Яндекс Метрики */}
-      <YMInitializer
-        accounts={[COUNTER_ID]}
-        options={{ clickmap: true, trackLinks: true, accurateTrackBounce: true, defer: true, }}
-      />
+      {initYandexMetrika()}
       <App />
     </HeadProvider>
   </StrictMode>
