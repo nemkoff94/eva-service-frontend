@@ -14,47 +14,7 @@ import ClientLogin from './pages/ClientLogin';
 import LoginType from './pages/LoginType';
 import FloatingButton from './components/FloatingButton';
 
-// 🔹 Хук для инициализации Яндекс.Метрики и отправки hits
-function useYandexMetrika(id) {
-  const location = useLocation();
-  const [isMetrikaLoaded, setIsMetrikaLoaded] = useState(false);
-
-  useEffect(() => {
-    // Если скрипт ещё не подключён, подключаем его динамически
-    if (!window.ym) {
-      const script = document.createElement('script');
-      script.src = 'https://mc.yandex.ru/metrika/tag.js';
-      script.async = true;
-      document.body.appendChild(script);
-
-      script.onload = () => {
-        window.ym(id, 'init', {
-          clickmap: true,
-          trackLinks: true,
-          accurateTrackBounce: true,
-          webvisor: false, // отключили Webvisor
-        });
-        setIsMetrikaLoaded(true);
-        // Отправляем первый hit после инициализации
-        window.ym(id, 'hit', location.pathname + location.search);
-      };
-    } else {
-      setIsMetrikaLoaded(true);
-    }
-  }, [id, location.pathname, location.search]);
-
-  // 🔹 Отправка hit при смене маршрута
-  useEffect(() => {
-    if (isMetrikaLoaded && window.ym) {
-      window.ym(id, 'hit', location.pathname + location.search);
-    }
-  }, [location, id, isMetrikaLoaded]);
-}
-
-// 🔹 Обертка маршрутов
 function AppRoutes() {
-  // ID вашего счетчика
-  useYandexMetrika(104162327);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
