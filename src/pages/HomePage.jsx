@@ -1,6 +1,7 @@
 // ~/eva-service-frontend/src/pages/HomePage.jsx
 import React, { useState, useRef } from 'react';
-import { Phone, BrandWhatsapp, Clock, MapPin, Headphones, Star } from 'lucide-react';
+import { Phone, Clock, MapPin, Headphones, Star } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import OrderForm from '../components/OrderForm';
 import PhotoCarousel from '../components/PhotoCarousel';
 import { useAuth } from '../context/AuthContext';
@@ -90,7 +91,7 @@ const HomePage = () => {
                 className="bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition-colors shadow-lg flex items-center gap-2"
                 title="WhatsApp"
               >
-                <BrandWhatsapp size={24} />
+                <FaWhatsapp size={24} />
                 <span className="hidden sm:inline">WhatsApp</span>
               </a>
             </div>
@@ -148,4 +149,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
