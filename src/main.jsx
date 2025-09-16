@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')).render(
       {/* Инициализация Яндекс Метрики */}
       <YMInitializer
         accounts={[COUNTER_ID]}
-        options={{ clickmap: true, trackLinks: true, accurateTrackBounce: true }}
+        options={{ clickmap: true, trackLinks: true, accurateTrackBounce: true, accurateTrackBounce: true, defer: true, }}
       />
       <App />
     </HeadProvider>
