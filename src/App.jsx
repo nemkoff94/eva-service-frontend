@@ -25,33 +25,10 @@ function AppRoutes() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/login-client" element={<ClientLogin />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute requiredRole="ADMIN">
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/driver/*"
-            element={
-              <ProtectedRoute requiredRole="DRIVER">
-                <DriverDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/client/*"
-            element={
-              <ProtectedRoute requiredRole="CLIENT">
-                <ClientDashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/admin/*" element={<ProtectedRoute requiredRole="ADMIN"><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/driver/*" element={<ProtectedRoute requiredRole="DRIVER"><DriverDashboard /></ProtectedRoute>} />
+          <Route path="/client/*" element={<ProtectedRoute requiredRole="CLIENT"><ClientDashboard /></ProtectedRoute>} />
 
-          {/* Fallback */}
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>
@@ -64,7 +41,6 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        {/* Компонент для отслеживания маршрутов SPA */}
         <RouteTracker />
         <AppRoutes />
         <FloatingButton />
