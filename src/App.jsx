@@ -1,32 +1,58 @@
 // ~/eva-service-frontend/src/App.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import AdminLogin from './pages/AdminLogin';
 import ClientDashboard from './pages/ClientDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import DriverDashboard from './pages/DriverDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import Footer from './components/Footer';
 import ClientLogin from './pages/ClientLogin';
 import LoginType from './pages/LoginType';
 
-// 🔹 Хук для отправки hit в Яндекс.Метрику при смене маршрута
+// 🔹 Хук для инициализации Яндекс.Метрики и отправки hits
 function useYandexMetrika(id) {
   const location = useLocation();
+  const [isMetrikaLoaded, setIsMetrikaLoaded] = useState(false);
 
   useEffect(() => {
-    if (window.ym) {
+    // Если скрипт ещё не подключён, подключаем его динамически
+    if (!window.ym) {
+      const script = document.createElement('script');
+      script.src = 'https://mc.yandex.ru/metrika/tag.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        window.ym(id, 'init', {
+          clickmap: true,
+          trackLinks: true,
+          accurateTrackBounce: true,
+          webvisor: false, // отключили Webvisor
+        });
+        setIsMetrikaLoaded(true);
+        // Отправляем первый hit после инициализации
+        window.ym(id, 'hit', location.pathname + location.search);
+      };
+    } else {
+      setIsMetrikaLoaded(true);
+    }
+  }, [id, location.pathname, location.search]);
+
+  // 🔹 Отправка hit при смене маршрута
+  useEffect(() => {
+    if (isMetrikaLoaded && window.ym) {
       window.ym(id, 'hit', location.pathname + location.search);
     }
-  }, [location, id]);
+  }, [location, id, isMetrikaLoaded]);
 }
 
-// 🔹 Обертка, чтобы хук работал внутри Router
+// 🔹 Обертка маршрутов
 function AppRoutes() {
-  // твой ID счётчика
+  // ID вашего счетчика
   useYandexMetrika(104162327);
 
   return (
@@ -48,7 +74,6 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/driver/*"
             element={
@@ -57,7 +82,6 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/client/*"
             element={
@@ -67,7 +91,7 @@ function AppRoutes() {
             }
           />
 
-          {/* Fallback route */}
+          {/* Fallback */}
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>
