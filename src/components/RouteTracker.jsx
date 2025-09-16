@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { COUNTER_ID } from "./main.jsx";
+
+const COUNTER_ID = 104173658;
 
 function RouteTracker() {
   const location = useLocation();
