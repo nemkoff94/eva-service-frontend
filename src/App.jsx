@@ -12,6 +12,7 @@ import DriverDashboard from './pages/DriverDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ClientLogin from './pages/ClientLogin';
 import LoginType from './pages/LoginType';
+import FloatingButton from './components/FloatingButton';
 
 // 🔹 Хук для инициализации Яндекс.Метрики и отправки hits
 function useYandexMetrika(id) {
@@ -105,6 +106,7 @@ function App() {
     <AuthProvider>
       <Router>
         <AppRoutes />
+        <FloatingButton />
       </Router>
     </AuthProvider>
   );
