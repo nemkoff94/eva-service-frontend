@@ -82,7 +82,7 @@ const HomePage = () => {
                 title="Позвонить"
               >
                 <Phone size={24} />
-                <span className="hidden sm:inline">+7 (920) 873-09-09</span>
+                <span>+7 (920) 873-09-09</span>
               </a>
               <a
                 href="https://wa.me/79208730909"
