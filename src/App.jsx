@@ -1,6 +1,5 @@
-// ~/eva-service-frontend/src/App.jsx
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -13,9 +12,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ClientLogin from './pages/ClientLogin';
 import LoginType from './pages/LoginType';
 import FloatingButton from './components/FloatingButton';
+import RouteTracker from './components/RouteTracker';
 
 function AppRoutes() {
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
@@ -65,6 +64,8 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Компонент для отслеживания маршрутов SPA */}
+        <RouteTracker />
         <AppRoutes />
         <FloatingButton />
       </Router>
